@@ -4,12 +4,19 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new
-    @user["first_name"] = params["user"]["first_name"]
-    @user["last_name"] = params["user"]["last_name"]
-    @user["email"] = params["user"]["email"]
-    @user["password"] = params["user"]["password"]
-    @user.save
-    redirect_to "/"
+    @user = User.new(user_params)
+    if @user.save
+      flash[:success] = "Account created successfully!"
+      redirect_to "/"
+    else
+      flash.now[:error] = @user.errors.full_messages.to_sentence
+      render :new
+    end
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:username, :email, :password)
   end
 end
